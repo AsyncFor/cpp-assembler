@@ -16,9 +16,13 @@ class Token {
     public:
         enum class Type {
             Number,
-            Operator,
+            Add,
+            Multiply,
+            Subtract,
             Separator,
             Identifier,
+            LeftSquare,
+            RightSquare,
             Label
         };
         
@@ -30,6 +34,13 @@ class Token {
         std::string m_value{};
 
 };
+
+bool is_numerical(const std::string& string) {
+    std::string::const_iterator itr = string.begin();
+    while (itr != string.end() && std::isdigit(*itr)) ++itr;
+    return !string.empty() && itr == string.end();
+}
+
 
 int main() {
     
@@ -60,7 +71,39 @@ int main() {
             case '+':
             {
                 current_word.push_back(current);
-                Token token(Token::Type::Operator, current_word);
+                Token token(Token::Type::Add, current_word);
+                tokens.push_back(token);
+                current_word.clear();
+                continue;
+            }
+            case '-':
+            {
+                current_word.push_back(current);
+                Token token(Token::Type::Subtract, current_word);
+                tokens.push_back(token);
+                current_word.clear();
+                continue;
+            }
+            case '*':
+            {
+                current_word.push_back(current);
+                Token token(Token::Type::Multiply, current_word);
+                tokens.push_back(token);
+                current_word.clear();
+                continue;
+            }
+            case '[':
+            {
+                current_word.push_back(current);
+                Token token(Token::Type::LeftSquare, current_word);
+                tokens.push_back(token);
+                current_word.clear();
+                continue;
+            }
+            case ']':
+            {
+                current_word.push_back(current);
+                Token token(Token::Type::RightSquare, current_word);
                 tokens.push_back(token);
                 current_word.clear();
                 continue;
@@ -75,11 +118,22 @@ int main() {
                 continue;
         }
 
-        if (input_file.peek() == ' ' || input_file.peek() == '\0' || input_file.peek() == '\n' || input_file.peek() == ',' || input_file.eof()) {
+        char peek = input_file.peek();
+        // if peek is a separator add current word as identifier
+        if (peek == ' ' || peek == '\n' || peek == ',' || peek == '[' || peek == ']' || peek == '+' || peek == '-' || peek == '*' || input_file.eof()) {
             current_word.push_back(current);
             
-            Token token(Token::Type::Identifier, current_word);
-            tokens.push_back(token);
+
+            // if current word is numerical we use number type
+            if (is_numerical(current_word)) {
+                Token token(Token::Type::Number, current_word);
+                tokens.push_back(token);
+            } else {
+                Token token(Token::Type::Identifier, current_word);
+                tokens.push_back(token);
+            }
+
+
             current_word.clear();
             
         } else {
