@@ -16,6 +16,5 @@ int main()
     lex.run();
 
     Parser parser(std::move(lex));
-    parser.parse();
 
 }
