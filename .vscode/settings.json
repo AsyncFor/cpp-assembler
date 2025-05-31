@@ -53,7 +53,9 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "variant": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "list": "cpp",
+        "xhash": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }
