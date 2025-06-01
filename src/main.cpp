@@ -5,9 +5,6 @@
 #include <variant>
 #include "utility.hpp"
 
-
-
-
 int main()
 {
 
@@ -17,6 +14,4 @@ int main()
 
     Parser parser(std::move(lex));
     parser.parse();
-
-
 }
