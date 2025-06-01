@@ -6,6 +6,9 @@ Token::Type Token::type() const { return m_type; }
 
 const std::string& Token::value() const { return m_value; }
 
+Token::operator bool() const {
+    return m_type != Type::Eof;
+}
 
 std::ostream& operator<<(std::ostream& os, const Token::Type& type) {
     switch (type)

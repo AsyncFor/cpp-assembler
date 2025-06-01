@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <variant>
 #include <array>
+#include <optional>
+#include <utility>
 
 
 struct Atom
@@ -16,6 +18,9 @@ struct Atom
     Type type;
     
     explicit Atom(std::string v, Type t = Type::Regular) : value(v), type(t) {}
+    void print_tree(int indent = 0) const {
+        std::cout << std::string(indent, ' ') << value << "\n";
+    }
 };
 
 
@@ -44,6 +49,7 @@ struct Operation
     std::vector<Expression> operands;
 
     Operation(std::string o, OperationType op_type, std::vector<Expression> ops, int b_power) : op{o}, operands{std::move(ops)}, type{op_type}, binding_power{b_power} {}
+    void print_tree(int indent = 0) const;
 };
 
 
@@ -71,16 +77,22 @@ public:
     Parser(Lexer &&lex);
     Parser(const char *file_name);
     void parse();
-    Instruction parse_instruction();
-    bool has_errors() const;
-    const std::vector<std::string>& get_errors() const;
+    Expression parse_expr();
+    Expression parse_operand();
+    Expression parse_instruction();
+    void skip_comment();
+    std::optional<int> get_prefix_binding_power(Token::Type type);
+    std::pair<int, int> get_infix_binding_power(Token::Type type);
+    const Token& peek();
+    const Token& peek_back();
+    const Token& next();
+    const Token& current();
+    void print_expression_tree(const Expression& expr, int indent = 0) const;
+    void print_all_trees() const;
 
     std::vector<Token>::const_iterator current_token;
     std::vector<Expression> expressions;
     
-    const Token& peek();
-    const Token& peek_back();
-    const Token& get();
     
 private:
     Lexer m_lexer;

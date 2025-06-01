@@ -33,6 +33,8 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const Type &type);
     friend std::ostream &operator<<(std::ostream &os, const Token &token);
 
+    operator bool() const;
+
 private:
     Type m_type{};
     std::string m_value{};
