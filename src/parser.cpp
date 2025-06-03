@@ -10,9 +10,16 @@ Expression make_operation(std::string op, Operation::OperationType type, std::ve
     return std::make_shared<Operation>(op, type, std::move(operands), precedence);
 }
 
-Expression make_instruction(std::string opcode, std::vector<Expression> operands)
+Instruction make_instruction(std::string opcode, std::vector<Expression> operands)
 {
-    return std::make_shared<Operation>(opcode, Operation::OperationType::Instruction, std::move(operands), 0);
+    switch (operands.size()) {
+        case 0: return Instruction{opcode};
+        case 1: return Instruction{opcode, operands[0]};
+        case 2: return Instruction{opcode, operands[0], operands[1]};
+        case 3: return Instruction{opcode, operands[0], operands[1], operands[2]};
+    }
+
+    throw std::runtime_error("too many operands for instructions");
 }
 
 void Operation::print_tree(int indent) const
@@ -49,23 +56,34 @@ void Operation::print_tree(int indent) const
     }
 }
 
-void Parser::print_expression_tree(const Expression &expr, int indent) const
-{
-    std::visit([indent](const auto &e)
-               {
+void print_expression_tree(const Expression& expr, int indent = 0) {
+    std::visit([indent](const auto& e) {
         using T = std::decay_t<decltype(e)>;
         if constexpr (std::is_same_v<T, Atom>) {
             e.print_tree(indent);
         } else if constexpr (std::is_same_v<T, std::shared_ptr<Operation>>) {
             e->print_tree(indent);
-        } }, expr);
+        }
+    }, expr);
+}
+
+void Parser::print_instruction_tree(const Instruction &inst, int indent) const
+{
+    std::cout << inst.opcode << "\n";
+
+    std::cout << "op1" << std::endl;
+    print_expression_tree(inst.op_1, ++indent);
+    std::cout << "op2" << std::endl;
+    print_expression_tree(inst.op_2, indent);
+    std::cout << "op3" << std::endl;
+    print_expression_tree(inst.op_3, indent);
 }
 
 void Parser::print_all_trees() const
 {
-    for (const auto &expr : expressions)
+    for (const auto &expr : instructions)
     {
-        print_expression_tree(expr);
+        print_instruction_tree(expr);
         std::cout << "-------------------\n";
     }
 }
@@ -205,7 +223,7 @@ Expression Parser::parse_operand()
     return left;
 }
 
-Expression Parser::parse_instruction()
+Instruction Parser::parse_instruction()
 {
     std::string opcode = current().value();
     next(); // consume opcode
@@ -249,7 +267,7 @@ void Parser::parse()
     {
         if (current().type() == Token::Type::Identifier)
         {
-            expressions.push_back(parse_instruction());
+            instructions.push_back(parse_instruction());
         }
         else if (current().type() == Token::Type::Comment)
         {

@@ -76,7 +76,7 @@ public:
     void parse();
     Expression parse_expr();
     Expression parse_operand();
-    Expression parse_instruction();
+    Instruction parse_instruction();
     void skip_comment();
     std::optional<int> get_prefix_binding_power(Token::Type type);
     std::pair<int, int> get_infix_binding_power(Token::Type type);
@@ -84,11 +84,11 @@ public:
     const Token &peek_back();
     const Token &next();
     const Token &current();
-    void print_expression_tree(const Expression &expr, int indent = 0) const;
+    void print_instruction_tree(const Instruction &inst, int indent = 0) const;
     void print_all_trees() const;
 
     std::vector<Token>::const_iterator current_token;
-    std::vector<Expression> expressions;
+    std::vector<Instruction> instructions;
 
 private:
     Lexer m_lexer;
