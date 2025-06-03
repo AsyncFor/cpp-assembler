@@ -56,7 +56,7 @@ void Operation::print_tree(int indent) const
     }
 }
 
-void print_expression_tree(const Expression& expr, int indent = 0) {
+void Parser::print_expression_tree(const Expression& expr, int indent) const {
     std::visit([indent](const auto& e) {
         using T = std::decay_t<decltype(e)>;
         if constexpr (std::is_same_v<T, Atom>) {
